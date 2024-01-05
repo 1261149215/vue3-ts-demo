@@ -2,10 +2,10 @@
 <template>
   <div class="loginRoot">
     <el-form :model="form" label-width="100px" ref="formRef" :rules="rules">
-        <el-form-item label="name">
+        <el-form-item label="name" prop="name">
             <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="password">
+        <el-form-item label="password" prop="password">
             <el-input v-model="form.password" type="password" />
         </el-form-item>
         <el-form-item>
@@ -20,6 +20,7 @@
 <script setup lang='ts'>
 import { reactive,ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import {request} from '@/utils/service'
 interface Form {
   name: string
   password: string
@@ -38,6 +39,18 @@ const rules = reactive<FormRules<Form>>({
         { required: true, message: 'Please input password', trigger: 'blur' }
     ]
 })
+const login = async (formRef: FormInstance | undefined) => {
+    if (!formRef) return
+    await formRef.validate(valid => {
+        if (valid) {
+            return request({
+                type: 'post',
+                url: '/api/info/create',
+                data: form,
+            })
+        }
+    })
+}
 </script>
 <style scoped>
 .loginRoot{
