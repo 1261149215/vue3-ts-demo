@@ -11,8 +11,8 @@
           active-text-color="#ffd04b"
           @select="handleSelect"
         >
-          <el-menu-item index="/home">首页</el-menu-item>
-          <el-menu-item index="/info">商品</el-menu-item>
+          <el-menu-item index="/project/info">首页</el-menu-item>
+          <!-- <el-menu-item index="/info">文章</el-menu-item> -->
         </el-menu>
       </el-header>
       <el-main >
@@ -25,7 +25,7 @@
 import { useRouter, RouterView } from 'vue-router'
 import { defineComponent, reactive, ref, toRefs } from 'vue'
 const router = useRouter()
-let activeName = ref('/home')
+let activeName = ref('/project/info')
 const handleSelect = (key: string, keyPath: string[]) => {
   activeName = key
   router.push({path: key})
