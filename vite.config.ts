@@ -26,11 +26,11 @@ export default defineConfig({
         target: 'http://127.0.0.1:3000',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
-        bypass(req, res, options) {
-          const url = new URL(options.rewrite(req.url) || '', options.target)?.href || '';
-          console.log(123, url)
-          res.setHeader('x-url', url);
-        }
+        // bypass(req, res, options) {
+        //   const url = new URL(options.rewrite(req.url) || '', options.target)?.href || '';
+        //   console.log(123, url)
+        //   res.setHeader('x-url', url);
+        // }
       }
     }
   }

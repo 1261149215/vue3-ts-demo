@@ -6,14 +6,12 @@
         <div style="width:90%;margin-right: 200px;">
           <h2>郭颖</h2>
           <div style="margin-bottom:20px">
-            有2年多前端开发经验，主导开发过交付上线的前端项目。本人热爱前端工作，有良好的责
-            任心，积极上进，有着较高的求知欲。 具备良好的团队协作精神，能利用自身技术能力提
-            升团队整体研发效率，提高团队影响力
+            {{ info.description }}
           </div>
           <div class="flex">
-            <span>27岁</span>
+            <span>{{info.age}}岁</span>
             <el-divider direction="vertical" />
-            <span>2年多经验</span>
+            <span>{{info.year}}经验</span>
             <el-divider direction="vertical" />
             <span>18720062888</span>
             <el-divider direction="vertical" />
@@ -36,8 +34,13 @@
       </template>
       <div class="flex">
         <span><el-icon><Aim /></el-icon>前端开发</span>
-        <span><el-icon><Location /></el-icon>浙江杭州</span>
-        <span><el-icon><Message /></el-icon>离职找工作 - 随时到岗</span>
+        <span><el-icon><Location /></el-icon>
+          <span v-for="(item,index) in info.location" :key="index" style="margin-right: 4px;">{{ item }}</span>
+        </span>
+        <span><el-icon><Message /></el-icon>
+          <template v-if="info.status">在职找工作</template>
+          <template v-else>离职找工作 - 随时到岗</template>
+        </span>
       </div>
     </el-card>
     <el-card class="box-card">
@@ -47,7 +50,9 @@
         </div>
       </template>
       <ul>
-        <li>熟练掌握 JavaScript 语言、ES6 规范，HTML5，CSS3及Sass语法，注重代码质量</li>
+        <li v-for="(item,index) in info.skills" :key="index">
+          {{ item.value }}
+        </li>
       </ul>
     </el-card>
     <el-card class="box-card">
@@ -69,14 +74,90 @@
         </div>
       </div>
     </el-card>
+    <el-card class="box-card">
+      <template #header>
+        <div class="card-header">
+          <h3>工作经验</h3>
+        </div>
+      </template>
+      <div style="margin-top: 12px;" v-for="(item,index) in info.jobs" :key="index">
+        <div style="display: flex; font-size: 16px;font-weight: bold;justify-content: space-between;">
+          <span>{{ formattedDate(item.date)[0] }}-{{ formattedDate(item.date)[1] }}</span>
+          <span>{{ item.company }}</span>
+          <span>{{ item.job }}</span>
+        </div>
+        <div>{{ item.details }}</div>
+      </div>
+    </el-card>
+    <el-card class="box-card">
+      <template #header>
+        <div class="card-header">
+          <h3>项目经验</h3>
+        </div>
+      </template>
+      <div style="margin-top: 12px;" v-for="(item,index) in info.projects" :key="index">
+        <div style="display: flex; font-size: 18px;font-weight: bold;justify-content: space-between;">
+          <span>{{ item.name }}</span>
+        </div>
+        <div style="margin-top: 12px;">
+          <b>项目介绍</b>
+          <div>{{ item.info }}</div>
+        </div>
+        <div style="margin-top: 12px;">
+          <b>工作内容</b>
+          <div>{{ item.details }}</div>
+        </div>
+      </div>
+    </el-card>
   </div>
 </template>
 
 <script setup lang='ts'>
-import { reactive,toRefs,onBeforeMount,onMounted, ref} from 'vue'
+import { computed, ref} from 'vue'
 import PIC from 'assets/image/pic.jpg'
-interface DataProps {}
+import {request} from '@/utils/service'
+import {Form} from '@/type/person'
+import {formatDates} from '@/utils/hooks'
+const formattedDate = ((val:string[]) => {
+  return formatDates(val); // 假设这里是需要格式化的日期字段
+});
+interface response {
+  code: number
+  data: {
+    description: string,
+    age: number,
+    year: number,
+    location: string,
+    status: boolean,
+    skills: string,
+    jobs: string,
+    projects: string
+  }
+}
 const pic = ref(PIC)
+let info = ref<Form>({
+  description: '',
+  age: 27,
+  year: 2,
+  location: [],
+  status: true,
+  skills: [],
+  jobs: [],
+  projects: []
+});
+const load = () => {
+  return request({
+    url: '/api/person/search'
+  }).then((res:response) => {
+    info.value = res.data
+    info.value.jobs = JSON.parse(res.data.jobs)
+    info.value.location = JSON.parse(res.data.location)
+    info.value.skills = JSON.parse(res.data.skills)
+    info.value.projects = JSON.parse(res.data.projects)
+    console.log(info.value)
+  })
+}
+load()
 </script>
 <style scoped>
 .flex{
